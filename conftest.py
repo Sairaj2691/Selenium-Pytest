@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 from utils.config_reader import load_config
 from pages.login_page import LoginPage
@@ -23,12 +24,10 @@ def driver(config):
         )
     else:
         raise ValueError(f"Browser '{browser}' is not supported")
-
     driver.maximize_window()
     driver.get(config["base_url"])
-
+    driver.implicitly_wait(5)
     yield driver
-
     driver.quit()
 
 
@@ -45,4 +44,7 @@ def login(driver, config):
         config["credentials"]["password"]
     )
 
+    time.sleep(10)
+    alert = driver.switch_to.alert()
+    alert.accept()
     return driver
