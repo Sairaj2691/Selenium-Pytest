@@ -1,11 +1,11 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+
+from webdriver_manager.chrome import ChromeDriverManager
 
 from utils.config_reader import load_config
 from pages.login_page import LoginPage
@@ -14,7 +14,7 @@ from pages.login_page import LoginPage
 def config():
     return load_config()
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def driver(config):
     browser = config["browser"].lower()
 
@@ -31,7 +31,7 @@ def driver(config):
     driver.quit()
 
 
-@pytest.fixture
+@pytest.fixture()
 def login(driver, config):
     """
     Logs into the application and returns driver
@@ -45,6 +45,25 @@ def login(driver, config):
     )
 
     time.sleep(10)
-    alert = driver.switch_to.alert()
-    alert.accept()
+    # alert = driver.switch_to.alert()
+    # alert.accept()
+    return driver
+
+@pytest.fixture
+def login(request, driver, config):
+    """
+    Logs into the application and returns driver
+    """
+    username, password = request.param
+    driver.get(config["base_url"])
+
+    login_page = LoginPage(driver)
+    login_page.login(
+        username,
+        password
+    )
+
+    time.sleep(10)
+    # alert = driver.switch_to.alert()
+    # alert.accept()
     return driver
